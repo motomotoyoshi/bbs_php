@@ -1,3 +1,20 @@
+<?php
+
+    $dataFile = "bbs.dat";
+
+    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+
+        $message = $_POST['message'];
+        $user     = $_POST['user'];
+
+        $newData  = $message . "\t" . $user . "\n";
+
+        $fp = fopen($dataFile, 'a');
+        fwrite($fp, $newData);
+        fclose($fp);
+
+    }
+?>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -6,9 +23,10 @@
 </head>
 <body>
     <h1>簡易掲示板</h1>
-    <form>
+    <form action="" method="post">
         message: <input type="text" name="message">
         user: <input type="text" name="user">
+        <input type="submit" value="投稿">
     </form>
     <h2>投稿一覧 （0件）</h2>
     <ul>
