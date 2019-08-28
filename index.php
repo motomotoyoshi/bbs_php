@@ -2,17 +2,28 @@
 
     $dataFile = "bbs.dat";
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' &&
+        isset($_POST['message']) &&
+        isset($_POST['user'])) {
 
-        $message = $_POST['message'];
-        $user     = $_POST['user'];
+        $message = trim($_POST['message']);
+        $user     = trim($_POST['user']);
 
-        $newData  = $message . "\t" . $user . "\n";
+        if ($message !== '') {
 
-        $fp = fopen($dataFile, 'a');
-        fwrite($fp, $newData);
-        fclose($fp);
+            $user = ($user === '') ? '名無し' : $user;
 
+            $message = str_replace("\t", ' ', $message);
+            $user = str_replace("\t", ' ', $user);
+
+            $postedAt = date('Y-m-d H:i:s');
+
+            $newData  = $message. "\t" . $user. "\t" . $postedAt. "\n";
+
+            $fp = fopen($dataFile, 'a');
+            fwrite($fp, $newData);
+            fclose($fp);
+        }
     }
 ?>
 <!DOCTYPE html>
