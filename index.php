@@ -24,6 +24,7 @@
         array_push($comments, $row);
     }
 
+    var_dump($comments);
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -36,7 +37,7 @@
     <h2>投稿一覧 （<?php echo count($posts); ?>件）</h2>
     <ul>
         <?php foreach($comments as $comment): ?>
-            <li><?php echo h($comment); ?></li>
+            <li><?php echo h($comment['comment']); ?></li>
         <?php endforeach; ?>
     </ul>
 </body>

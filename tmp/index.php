@@ -13,7 +13,7 @@
         exit;
     }
 
-    $dataFile = "bbs.dat";
+    $dataFile = "../bbs.dat";
 
     session_start();
 
@@ -70,7 +70,7 @@
     foreach ($dbh->query($sql) as $row) {
         array_push($comments, $row);
     }
-
+    var_dump($posts);
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -89,7 +89,7 @@
     <h2>投稿一覧 （<?php echo count($posts); ?>件）</h2>
     <ul>
         <?php foreach($comments as $comment): ?>
-            <li><?php echo h($comment); ?></li>
+            <li><?php echo h($comment['comment']); ?></li>
         <?php endforeach; ?>
 
         <?php if (count($posts)): ?>
