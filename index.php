@@ -2,6 +2,10 @@
 
     $dataFile = "bbs.dat";
 
+    function h($s) {
+        return htmlspecialchars($s, ENT_QUOTES, 'utf-8');
+    }
+
     if ($_SERVER['REQUEST_METHOD'] == 'POST' &&
         isset($_POST['message']) &&
         isset($_POST['user'])) {
@@ -25,6 +29,9 @@
             fclose($fp);
         }
     }
+
+    $posts = file($dataFile, FILE_IGNORE_NEW_LINES);
+    $posts = array_reverse($posts);
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -39,9 +46,16 @@
         user: <input type="text" name="user">
         <input type="submit" value="投稿">
     </form>
-    <h2>投稿一覧 （0件）</h2>
+    <h2>投稿一覧 （<?php echo count($posts); ?>件）</h2>
     <ul>
-        <li>まだ投稿はありません。</li>
+        <?php if (count($posts)): ?>
+            <?php foreach ($posts as $post): ?>
+            <?php list($message, $user, $postedAt) = explode("\t", $post); ?>
+                <li><?php echo h($message); ?> (<?php echo h($user)?>) - <?php echo h($postedAt); ?></li>
+            <?php endforeach; ?>
+        <?php else:?>
+            <li>まだ投稿はありません。</li>
+        <?php endif;?>
     </ul>
 </body>
 </html>
