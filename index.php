@@ -3,6 +3,9 @@
     define('DB_USER', 'dbuser');
     define('DB_PASSWORD', 'jM4#HB9V');
     define('DB_NAME', 'paging_php');
+    define('COMMENTS_PER_PAGE', 5);
+
+    $page = 1;
 
     error_reporting(E_ALL & ~E_NOTICE);
 
@@ -64,7 +67,9 @@
     $posts = file($dataFile, FILE_IGNORE_NEW_LINES);
     $posts = array_reverse($posts);
 
-    $sql = "select * from comments";
+    $offset = COMMENTS_PER_PAGE * ($page - 1);
+
+    $sql = "select * from comments limit ".$offset.",".COMMENTS_PER_PAGE;
     $comments = array();
 
     foreach ($dbh->query($sql) as $row) {
