@@ -5,7 +5,11 @@
     define('DB_NAME', 'paging_php');
     define('COMMENTS_PER_PAGE', 5);
 
-    $page = 1;
+    if (preg_match('/^[1-9][0-9]*$/', $_GET['page'])) {
+        $page = (int)$_GET['page'];
+    }else {
+        $page = 1;
+    }
 
     error_reporting(E_ALL & ~E_NOTICE);
 
@@ -76,13 +80,11 @@
         array_push($comments, $row);
     }
 
-//    $list = array();
-//    foreach ($dbh->query("select * from comments") as $row2) {
-//        array_push($list, $row2);
-//    }
-
     $total = $dbh->query("select count(*) from comments")->fetchColumn();
-    $toalPages = ceil($total / COMMENTS_PER_PAGE);
+    $totalPages = ceil($total / COMMENTS_PER_PAGE);
+
+    $from = $offset + 1;
+    $to = ($offset + COMMENTS_PER_PAGE) < $total ? ($offset + COMMENTS_PER_PAGE) : $total;
 
 ?>
 <!DOCTYPE html>
@@ -99,7 +101,7 @@
         <input type="submit" value="投稿">
         <input type="hidden" name="token" value="<?php echo h($_SESSION['token']);?>">
     </form>
-    <h2>投稿一覧 （<?php echo $total; ?>件中<?php echo COMMENTS_PER_PAGE; ?>件表示）</h2>
+    <h2>投稿一覧 （全<?php echo $total; ?>件中<?php echo $from; ?>件〜<?php echo $to;?>件表示）</h2>
     <ul>
         <?php if (count($comments)): ?>
         <?php foreach($comments as $comment): ?>
@@ -113,8 +115,20 @@
         <?php endif;?>
 
     </ul>
-    <?php for ($i = 1; $i <= $toalPages; $i++): ?>
-        <a href="?page=<?php echo $i;?>"><?php echo $i; ?></a>
+
+    <?php if ($page > 1): ?>
+        <a href="?page=<?php echo $page-1;?>">前</a>
+    <?php endif; ?>
+    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+        <?php if ($page == $i): ?>
+            <strong><a href="?page=<?php echo $i;?>"><?php echo $i; ?></a></strong>
+        <?php else: ?>
+            <a href="?page=<?php echo $i;?>"><?php echo $i; ?></a>
+        <?php endif; ?>
     <?php endfor; ?>
+
+    <?php if ($page < $totalPages): ?>
+        <a href="?page=<?php echo $page+1; ?>">次</a>
+    <?php endif; ?>
 </body>
 </html>
