@@ -75,7 +75,12 @@
     foreach ($dbh->query($sql) as $row) {
         array_push($comments, $row);
     }
-    var_dump($posts);
+
+    $list = array();
+    foreach ($dbh->query("select * from comments") as $row2) {
+        array_push($list, $row2);
+    }
+
 ?>
 <!DOCTYPE html>
 <html lang="ja">
@@ -91,20 +96,19 @@
         <input type="submit" value="投稿">
         <input type="hidden" name="token" value="<?php echo h($_SESSION['token']);?>">
     </form>
-    <h2>投稿一覧 （<?php echo count($posts); ?>件）</h2>
+    <h2>投稿一覧 （<?php echo count($list); ?>件中<?php echo COMMENTS_PER_PAGE; ?>件表示）</h2>
     <ul>
+        <?php if (count($list)): ?>
         <?php foreach($comments as $comment): ?>
-            <li><?php echo h($comment['comment']); ?></li>
+            <li>
+                <?php echo h($comment['comment']); ?> - 
+                <?php echo h($comment['created']); ?>
+            </li>
         <?php endforeach; ?>
-
-        <?php if (count($posts)): ?>
-            <?php foreach ($posts as $post): ?>
-            <?php list($message, $user, $postedAt) = explode("\t", $post); ?>
-                <li><?php echo h($message); ?> (<?php echo h($user)?>) - <?php echo h($postedAt); ?></li>
-            <?php endforeach; ?>
         <?php else:?>
             <li>まだ投稿はありません。</li>
         <?php endif;?>
+
     </ul>
 </body>
 </html>
