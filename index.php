@@ -20,8 +20,6 @@
         exit;
     }
 
-    $dataFile = "bbs.dat";
-
     session_start();
 
     function setToken() {
@@ -40,29 +38,20 @@
         return htmlspecialchars($s, ENT_QUOTES, 'utf-8');
     }
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST' &&
-        isset($_POST['message']) &&
-        isset($_POST['user'])) {
-
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message'])) {
+        
         checkToken();
 
         $message = trim($_POST['message']);
-        $user     = trim($_POST['user']);
 
         if ($message !== '') {
 
-            $user = ($user === '') ? '名無し' : $user;
-
             $message = str_replace("\t", ' ', $message);
-            $user = str_replace("\t", ' ', $user);
+            $created = date('Y-m-d H:i:s');
+            $modified = date('Y-m-d H:i:s');
 
-            $postedAt = date('Y-m-d H:i:s');
+            $dbh->query("insert into comments(comment, created, modified) values('".$message."', '".$created."', '".$modified."');");     
 
-            $newData  = $message. "\t" . $user. "\t" . $postedAt. "\n";
-
-            $fp = fopen($dataFile, 'a');
-            fwrite($fp, $newData);
-            fclose($fp);
         }
     } else {
         setToken();
@@ -73,7 +62,7 @@
 
     $offset = COMMENTS_PER_PAGE * ($page - 1);
 
-    $sql = "select * from comments limit ".$offset.",".COMMENTS_PER_PAGE;
+    $sql = "select * from comments order by created desc limit ".$offset.",".COMMENTS_PER_PAGE;
     $comments = array();
 
     foreach ($dbh->query($sql) as $row) {
@@ -94,10 +83,10 @@
     <title>簡易掲示板</title>
 </head>
 <body>
+
     <h1>簡易掲示板</h1>
     <form action="" method="post">
         message: <input type="text" name="message">
-        user: <input type="text" name="user">
         <input type="submit" value="投稿">
         <input type="hidden" name="token" value="<?php echo h($_SESSION['token']);?>">
     </form>
